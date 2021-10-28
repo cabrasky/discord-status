@@ -1,0 +1,89 @@
+{
+  "name": "discordstatus",
+  "displayName": "discord-status",
+  "description": "Discord RPC High custumizable",
+  "version": "1.0.2",
+  "publisher": "cabrasky",
+  "engines": {
+    "vscode": "^1.61.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "repository": {
+    "url": "https://github.com/cabrasky/discord-status"
+  },
+  "main": "./extension",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "discord-status configuration",
+      "properties": {
+        "DiscordStatus.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable|Disable discord-status"
+        },
+        "DiscordStatus.initText": {
+          "type": "string",
+          "default": "Connecting ...",
+          "description": "Starting Text for the Status Bar."
+        },
+        "DiscordStatus.connectedText": {
+          "type": "string",
+          "default": "Connected",
+          "description": "the status bar tag text."
+        },
+        "DiscordStatus.discordStatusDebug": {
+          "type": "string",
+          "default": "Debugging: ",
+          "description": "Text status when debuggin"
+        },
+        "DiscordStatus.discordStatusEditing": {
+          "type": "string",
+          "default": "Editando: ",
+          "description": "Text status when editing files"
+        },
+        "DiscordStatus.discordStatusProyect": {
+          "type": "string",
+          "default": "En el proyecto: ",
+          "description": "Text proyect"
+        },
+        "DiscordStatus.discordStatusConfig": {
+          "type": "string",
+          "default": "En la configuracion del proyecto ",
+          "description": "donfiguration text"
+        },
+        "DiscordStatus.discordGithubButton": {
+          "type": "string",
+          "default": "Ir a Github",
+          "description": "Github Buttom Name"
+        },
+        "DiscordStatus.discordShowErrors":{
+          "type": "boolean",
+          "default": true,
+          "description": "Allow the extension to show the error count"
+        },
+        "DiscordStatus.discordShowErrorsText":{
+          "type": "string",
+          "default": "Tiene {} errores",
+          "description": "Set the text to show the error count"
+        }
+      }
+    }
+  },
+  "devDependencies": {},
+  "extensionDependencies": [],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Cabrasky",
+  "license": "ISC",
+  "dependencies": {
+    "child-process": "^1.0.2",
+    "discord-rpc": "^4.0.1"
+  }
+}

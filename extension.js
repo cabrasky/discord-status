@@ -16,11 +16,18 @@ var clientId = '898271639354081302'
 
 var connectedDC = false
 
-
-
 var dir = ""
 var gitURL = ""
+var gitCMD = 'git config --get remote.origin.url'
+    
+switch (process.platform) {
+  case 'win32':
+    gitCMD = 'powershell ' + gitCMD
+    break;
 
+  default:
+    break;
+}
 
 function updateLoop(){
   if(connectedDC){
@@ -67,6 +74,10 @@ function updateDiscord() {
       actitity.smallImageKey = 'edit';
       dir = parse(vscode.window.activeTextEditor.document.fileName).dir
     }
+
+    cp.exec( gitCMD , {cwd: dir}, (err, stdout, stderr) => {
+      gitURL = stdout.replace(".git\n", "")
+    });
     
     if(config.discordShowErrors){
       const diag = vscode.languages.getDiagnostics();
@@ -129,12 +140,9 @@ function activate(context) {
         sb.text = config.connectedText;
         connectedDC = true;
       });
-      
     
 
-    cp.exec(`git config --get remote.origin.url`, { cwd: dir}, (err, stdout, stderr) => {
-      gitURL = stdout.replace(".git\n", "")
-    });
+    
   }
 }
 

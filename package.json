@@ -2,10 +2,10 @@
   "name": "discordstatus",
   "displayName": "discord-status",
   "description": "Discord RPC High custumizable",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "publisher": "cabrasky",
   "engines": {
-    "vscode": "^1.61.0"
+    "vscode": "^1.51.0"
   },
   "categories": [
     "Other"
@@ -36,6 +36,11 @@
           "type": "string",
           "default": "Connected",
           "description": "the status bar tag text."
+        },
+        "DiscordStatus.notConnectedText": {
+          "type": "string",
+          "default": "Error Connecting",
+          "description": "the status bar tag text if the connection fails."
         },
         "DiscordStatus.discordStatusDebug": {
           "type": "string",

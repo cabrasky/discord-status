@@ -1,8 +1,8 @@
 const vscode = require('vscode');
-var sb = null;
-
+var sb = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left,0);
 var startTime = null
 
+var config = vscode.workspace.getConfiguration('DiscordStatus');
 var Presence = require("discord-rpc");
 
 const cp = require('child_process');
@@ -10,11 +10,11 @@ const { parse } = require('path');
 
 const Client = Presence.Client
 
-let rpc = new Client({ transport: 'ipc' });
+let rpc =new Client({ transport: 'ipc' });
 
 var clientId = '898271639354081302'
 
-
+var connectedDC = false
 
 
 
@@ -23,8 +23,9 @@ var gitURL = ""
 
 
 function updateLoop(){
-
-  updateDiscord();           
+  if(connectedDC){
+    updateDiscord();
+  }           
 
   setTimeout( updateLoop, 200 );
 
@@ -91,11 +92,10 @@ function updateDiscord() {
   rpc.setActivity(actitity);
   
   
+  
 }
 
 function CreateStatusBar() {
-  var config = vscode.workspace.getConfiguration('DiscordStatus');
-  var sb = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left,0);
   sb.text = config.initText;
   sb.show();
   return sb;
@@ -115,9 +115,6 @@ function updateOfConfigs() {
 
 
 
-
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 function activate(context) {
   startTime = Date.now();
   var config = vscode.workspace.getConfiguration('DiscordStatus');
@@ -127,10 +124,13 @@ function activate(context) {
     context.subscriptions.push(sb);
     updateLoop();
 
-    rpc.login({ clientId });
-    rpc.on('ready', () => {
-      sb.text = config.connectedText;
-    });
+      rpc.login({ clientId }).catch(sb.text = config.notConnectedText);
+      rpc.on('ready', () => {
+        sb.text = config.connectedText;
+        connectedDC = true;
+      });
+      
+    
 
     cp.exec(`git config --get remote.origin.url`, { cwd: dir}, (err, stdout, stderr) => {
       gitURL = stdout.replace(".git\n", "")

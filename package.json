@@ -2,7 +2,7 @@
   "name": "discordstatus",
   "displayName": "discord-status",
   "description": "Discord RPC High custumizable",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "publisher": "cabrasky",
   "engines": {
     "vscode": "^1.51.0"

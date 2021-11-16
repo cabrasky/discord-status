@@ -7,6 +7,7 @@ var Presence = require("discord-rpc");
 
 const cp = require('child_process');
 const { parse } = require('path');
+const { cwd } = require('process');
 
 const Client = Presence.Client
 
@@ -19,7 +20,7 @@ var connectedDC = false
 var dir = ""
 var gitURL = ""
 var gitCMD = 'git config --get remote.origin.url'
-    
+
 switch (process.platform) {
   case 'win32':
     gitCMD = 'powershell ' + gitCMD
@@ -75,9 +76,7 @@ function updateDiscord() {
       dir = parse(vscode.window.activeTextEditor.document.fileName).dir
     }
 
-    cp.exec( gitCMD , {cwd: dir}, (err, stdout, stderr) => {
-      gitURL = stdout.replace(".git\n", "")
-    });
+    gitURL = cp.execSync( gitCMD , {cwd: dir}).toString().replace(".git\n", "")
     
     if(config.discordShowErrors){
       const diag = vscode.languages.getDiagnostics();

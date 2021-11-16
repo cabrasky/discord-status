@@ -7,7 +7,6 @@ var Presence = require("discord-rpc");
 
 const cp = require('child_process');
 const { parse } = require('path');
-const { cwd } = require('process');
 
 const Client = Presence.Client
 
@@ -75,8 +74,12 @@ function updateDiscord() {
       actitity.smallImageKey = 'edit';
       dir = parse(vscode.window.activeTextEditor.document.fileName).dir
     }
-
-    gitURL = cp.execSync( gitCMD , {cwd: dir}).toString().replace(".git\n", "")
+    try {
+      gitURL = cp.execSync( gitCMD , {cwd: dir}).toString().replace(".git\n", "")
+    } catch (error) {
+      
+    }
+    
     
     if(config.discordShowErrors){
       const diag = vscode.languages.getDiagnostics();

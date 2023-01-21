@@ -66,11 +66,11 @@ function updateDiscord() {
   };
   if(vscode.window.activeTextEditor != undefined){
     if (vscode.debug.activeDebugSession) {
-      actitity.state = config.discordStatusDebug + vscode.window.activeTextEditor.document.fileName.slice(vscode.window.activeTextEditor.document.fileName.lastIndexOf('\\') + 1);
+      actitity.state = config.discordStatusDebug + vscode.window.activeTextEditor.document.fileName.replace(vscode.workspace.rootPath + "/", "")
       actitity.smallImageKey = 'debug';
       dir = parse(vscode.window.activeTextEditor.document.fileName).dir
     } else {
-      actitity.state =  config.discordStatusEditing + vscode.window.activeTextEditor.document.fileName.slice(vscode.window.activeTextEditor.document.fileName.lastIndexOf('\\') + 1),
+      actitity.state =  config.discordStatusEditing + vscode.window.activeTextEditor.document.fileName.replace(vscode.workspace.rootPath + "/", "")
       actitity.smallImageKey = 'edit';
       dir = parse(vscode.window.activeTextEditor.document.fileName).dir
     }

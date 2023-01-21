@@ -1,8 +1,8 @@
 {
   "name": "discordstatus",
-  "displayName": "discord-status",
+  "displayName": "Discord Status",
   "description": "Discord RPC High custumizable",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "publisher": "cabrasky",
   "engines": {
     "vscode": "^1.51.0"
@@ -87,6 +87,9 @@
   },
   "author": "Cabrasky",
   "license": "ISC",
+  "extensionKind": [
+    "ui"
+  ],
   "dependencies": {
     "child-process": "^1.0.2",
     "discord-rpc": "^4.0.1"

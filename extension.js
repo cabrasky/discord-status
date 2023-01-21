@@ -1,8 +1,9 @@
 const vscode = require('vscode');
+const idExtension = "DiscordStatus";
 var sb = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left,0);
 var startTime = null
 
-var config = vscode.workspace.getConfiguration('DiscordStatus');
+var config = vscode.workspace.getConfiguration(idExtension);
 var Presence = require("discord-rpc");
 
 const cp = require('child_process');
@@ -39,7 +40,7 @@ function updateLoop(){
 }
 
 function updateDiscord() {
-  var config = vscode.workspace.getConfiguration('DiscordStatus');
+  var config = vscode.workspace.getConfiguration(idExtension);
   var actitity = {
     state: "",
     details: config.discordStatusProyect +  vscode.workspace.name,
@@ -66,11 +67,11 @@ function updateDiscord() {
   };
   if(vscode.window.activeTextEditor != undefined){
     if (vscode.debug.activeDebugSession) {
-      actitity.state = config.discordStatusDebug + vscode.window.activeTextEditor.document.fileName.replace(vscode.workspace.rootPath + "/", "")
+      actitity.state = config.discordStatusDebug + vscode.window.activeTextEditor.document.fileName.replace(vscode.workspace.rootPath, "").substring(1)
       actitity.smallImageKey = 'debug';
       dir = parse(vscode.window.activeTextEditor.document.fileName).dir
     } else {
-      actitity.state =  config.discordStatusEditing + vscode.window.activeTextEditor.document.fileName.replace(vscode.workspace.rootPath + "/", "")
+      actitity.state =  config.discordStatusEditing + vscode.window.activeTextEditor.document.fileName.replace(vscode.workspace.rootPath, "").substring(1)
       actitity.smallImageKey = 'edit';
       dir = parse(vscode.window.activeTextEditor.document.fileName).dir
     }
@@ -115,7 +116,7 @@ function CreateStatusBar() {
 }
 
 function updateOfConfigs() {
-  var config = vscode.workspace.getConfiguration('DiscordStatus');
+  var config = vscode.workspace.getConfiguration(idExtension);
   if(config.enable){
     sb.text = config.initText;
     sb.show();
@@ -130,7 +131,7 @@ function updateOfConfigs() {
 
 function activate(context) {
   startTime = Date.now();
-  var config = vscode.workspace.getConfiguration('DiscordStatus');
+  var config = vscode.workspace.getConfiguration(idExtension);
   if(config.enable){
     sb = CreateStatusBar();
     vscode.workspace.onDidChangeConfiguration(updateOfConfigs);
@@ -153,4 +154,8 @@ exports.activate = activate;
 
 // this method is called when your extension is deactivated
 function deactivate() {}
-exports.deactivate = deactivate;
+
+module.exports = {
+	activate,
+	deactivate
+}

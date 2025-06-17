@@ -17,6 +17,11 @@
     "url": "https://github.com/cabrasky/discord-status"
   },
   "main": "./extension.js",
+  "types": "./extension.ts",
+  "scripts": {
+    "compile": "tsc extension.ts --lib ES2020,dom --module commonjs --target ES2020 --outDir .",
+    "watch": "tsc extension.ts --lib ES2020,dom --module commonjs --target ES2020 --outDir . --watch"
+  },
   "contributes": {
     "configuration": {
       "type": "object",
@@ -25,57 +30,57 @@
         "DiscordStatus.enable": {
           "type": "boolean",
           "default": true,
-          "description": "Enable|Disable discord-status"
+          "description": "Enable or disable Discord Status integration."
         },
         "DiscordStatus.initText": {
           "type": "string",
           "default": "Connecting ...",
-          "description": "Starting Text for the Status Bar."
+          "description": "Text shown in the status bar while connecting."
         },
         "DiscordStatus.connectedText": {
           "type": "string",
           "default": "Connected",
-          "description": "the status bar tag text."
+          "description": "Text shown in the status bar when connected."
         },
         "DiscordStatus.notConnectedText": {
           "type": "string",
           "default": "Error Connecting",
-          "description": "the status bar tag text if the connection fails."
+          "description": "Text shown in the status bar if connection fails."
         },
         "DiscordStatus.discordStatusDebug": {
           "type": "string",
           "default": "Debugging: ",
-          "description": "Text status when debuggin"
+          "description": "Prefix for the file name when debugging."
         },
         "DiscordStatus.discordStatusEditing": {
           "type": "string",
-          "default": "Editando: ",
-          "description": "Text status when editing files"
+          "default": "Editing: ",
+          "description": "Prefix for the file name when editing."
         },
         "DiscordStatus.discordStatusProyect": {
           "type": "string",
-          "default": "En el proyecto: ",
-          "description": "Text proyect"
+          "default": "In project: ",
+          "description": "Prefix for the project name."
         },
         "DiscordStatus.discordStatusConfig": {
           "type": "string",
-          "default": "En la configuracion del proyecto ",
-          "description": "donfiguration text"
+          "default": "In project configuration ",
+          "description": "Text shown when in configuration."
         },
         "DiscordStatus.discordGithubButton": {
           "type": "string",
-          "default": "Ir a Github",
-          "description": "Github Buttom Name"
+          "default": "Go to Github",
+          "description": "Label for the GitHub button in Discord."
         },
         "DiscordStatus.discordShowErrors": {
           "type": "boolean",
           "default": true,
-          "description": "Allow the extension to show the error count"
+          "description": "Show error count in Discord status."
         },
         "DiscordStatus.discordShowErrorsText": {
           "type": "string",
-          "default": "Tiene {} errores",
-          "description": "Set the text to show the error count"
+          "default": "You have {} errors",
+          "description": "Text for error count. Use {} as a placeholder for the number."
         }
       }
     }

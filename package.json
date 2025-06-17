@@ -1,8 +1,16 @@
 {
   "name": "discordstatus",
   "displayName": "Discord Status",
-  "description": "Discord RPC High custumizable",
-  "version": "1.0.8",
+  "description": "Highly customizable Discord RPC integration.",
+  "keywords": [
+    "discord",
+    "status",
+    "rpc",
+    "integration",
+    "vscode"
+  ],
+  "icon": "images/icon.png",
+  "version": "1.1.0",
   "publisher": "cabrasky",
   "engines": {
     "vscode": "^1.74.0"

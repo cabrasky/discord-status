@@ -1,161 +1,118 @@
-const vscode = require('vscode');
-const idExtension = "DiscordStatus";
-var sb = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left,0);
-var startTime = null
-
-var config = vscode.workspace.getConfiguration(idExtension);
-var Presence = require("discord-rpc");
-
-const cp = require('child_process');
-const { parse } = require('path');
-
-const Client = Presence.Client
-
-let rpc =new Client({ transport: 'ipc' });
-
-var clientId = '898271639354081302'
-
-var connectedDC = false
-
-var dir = ""
-var gitURL = ""
-var gitCMD = 'git config --get remote.origin.url'
-
-switch (process.platform) {
-  case 'win32':
-    gitCMD = 'powershell ' + gitCMD
-    break;
-
-  default:
-    break;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deactivate = exports.activate = void 0;
+const vscode = require("vscode");
+const path_1 = require("path");
+const cp = require("child_process");
+const Presence = require("discord-rpc");
+const EXTENSION_ID = 'DiscordStatus';
+const CLIENT_ID = '898271639354081302';
+const STATUS_BAR_ALIGNMENT = vscode.StatusBarAlignment.Left;
+const GIT_CMD = process.platform === 'win32' ? 'powershell git config --get remote.origin.url' : 'git config --get remote.origin.url';
+let statusBar = vscode.window.createStatusBarItem(STATUS_BAR_ALIGNMENT, 0);
+let startTime = null;
+let rpc = new Presence.Client({ transport: 'ipc' });
+let connectedToDiscord = false;
+let gitUrl = '';
+let dir = '';
+function getConfig() {
+    return vscode.workspace.getConfiguration(EXTENSION_ID);
 }
-
-function updateLoop(){
-  if(connectedDC){
-    updateDiscord();
-  }           
-
-  setTimeout( updateLoop, 200 );
-
+function updateLoop() {
+    if (connectedToDiscord) {
+        updateDiscord();
+    }
+    setTimeout(updateLoop, 200);
 }
-
-function updateDiscord() {
-  var config = vscode.workspace.getConfiguration(idExtension);
-  var actitity = {
-    state: "",
-    details: config.discordStatusProyect +  vscode.workspace.name,
-    startTimestamp: startTime,
-    largeImageKey: 'vscode',
-    smallImageKey: "",
-    instance: true
-  }
-  if(gitURL != ""){
-    actitity = {
-      state: "",
-      details: config.discordStatusProyect +  vscode.workspace.name,
-      startTimestamp: startTime,
-      largeImageKey: 'vscode',
-      smallImageKey: "",
-      instance: true,
-      buttons: [
-        {
-          label: config.discordGithubButton,
-          url: gitURL
-        }
-      ]
-    }
-  };
-  if(vscode.window.activeTextEditor != undefined){
-    if (vscode.debug.activeDebugSession) {
-      actitity.state = config.discordStatusDebug + vscode.window.activeTextEditor.document.fileName.replace(vscode.workspace.rootPath, "").substring(1)
-      actitity.smallImageKey = 'debug';
-      dir = parse(vscode.window.activeTextEditor.document.fileName).dir
-    } else {
-      actitity.state =  config.discordStatusEditing + vscode.window.activeTextEditor.document.fileName.replace(vscode.workspace.rootPath, "").substring(1)
-      actitity.smallImageKey = 'edit';
-      dir = parse(vscode.window.activeTextEditor.document.fileName).dir
-    }
+function getGitUrl(currentDir) {
     try {
-      gitURL = cp.execSync( gitCMD , {cwd: dir}).toString().replace(".git\n", "")
-    } catch (error) {
-      
+        return cp.execSync(GIT_CMD, { cwd: currentDir }).toString().replace('.git\n', '');
     }
-    
-    
-    if(config.discordShowErrors){
-      const diag = vscode.languages.getDiagnostics();
-
-      let total = 0;
-      if(diag != undefined && diag[0] != undefined){
-        
-        var diag1 = diag[0][1]
-        for(var i = 0; i < diag1.length; i++){
-          var diagcurr = diag1[i]
-          if(diagcurr.severity == 0){
-            total++;
-          }
+    catch {
+        return '';
+    }
+}
+function getErrorCount() {
+    const diagnostics = vscode.languages.getDiagnostics();
+    if (!diagnostics || !diagnostics[0])
+        return 0;
+    const diagList = diagnostics[0][1];
+    return diagList.filter((d) => d.severity === 0).length;
+}
+function buildActivity(config) {
+    const workspaceName = vscode.workspace.name || '';
+    let activity = {
+        state: '',
+        details: config.discordStatusProyect + workspaceName,
+        startTimestamp: startTime,
+        largeImageKey: 'vscode',
+        smallImageKey: '',
+        instance: true
+    };
+    if (gitUrl) {
+        activity.buttons = [{ label: config.discordGithubButton, url: gitUrl }];
+    }
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+        const fileName = editor.document.fileName.replace(vscode.workspace.rootPath || '', '').substring(1);
+        if (vscode.debug.activeDebugSession) {
+            activity.state = config.discordStatusDebug + fileName;
+            activity.smallImageKey = 'debug';
         }
-      }
-
-      actitity.state = config.discordShowErrorsText.replace("{}", total) + "\n" + actitity.state
+        else {
+            activity.state = config.discordStatusEditing + fileName;
+            activity.smallImageKey = 'edit';
+        }
+        dir = (0, path_1.parse)(editor.document.fileName).dir;
+        gitUrl = getGitUrl(dir);
+        if (config.discordShowErrors) {
+            const errorCount = getErrorCount();
+            activity.state = config.discordShowErrorsText.replace("{}", errorCount.toString()) + '\n' + activity.state;
+        }
     }
-  } else {
-      actitity.state = config.discordStatusConfig
-      actitity.smallImageKey = 'config'
-  }
-  rpc.setActivity(actitity);
-  
-  
-  
+    else {
+        activity.state = config.discordStatusConfig;
+        activity.smallImageKey = 'config';
+    }
+    return activity;
 }
-
-function CreateStatusBar() {
-  sb.text = config.initText;
-  sb.show();
-  return sb;
+function updateDiscord() {
+    const config = getConfig();
+    const activity = buildActivity(config);
+    rpc.setActivity(activity);
 }
-
-function updateOfConfigs() {
-  var config = vscode.workspace.getConfiguration(idExtension);
-  if(config.enable){
-    sb.text = config.initText;
-    sb.show();
-  }else{
-    sb.hide();
-  }
-  
+function createStatusBar(config) {
+    statusBar.text = config.initText;
+    statusBar.show();
+    return statusBar;
 }
-
-
-
-
+function updateStatusBarConfig() {
+    const config = getConfig();
+    if (config.enable) {
+        statusBar.text = config.initText;
+        statusBar.show();
+    }
+    else {
+        statusBar.hide();
+    }
+}
 function activate(context) {
-  startTime = Date.now();
-  var config = vscode.workspace.getConfiguration(idExtension);
-  if(config.enable){
-    sb = CreateStatusBar();
-    vscode.workspace.onDidChangeConfiguration(updateOfConfigs);
-    context.subscriptions.push(sb);
+    startTime = Date.now();
+    const config = getConfig();
+    if (!config.enable)
+        return;
+    statusBar = createStatusBar(config);
+    vscode.workspace.onDidChangeConfiguration(updateStatusBarConfig);
+    context.subscriptions.push(statusBar);
     updateLoop();
-
-      rpc.login({ clientId }).catch(sb.text = config.notConnectedText);
-      rpc.on('ready', () => {
-        sb.text = config.connectedText;
-        connectedDC = true;
-      });
-    
-
-    
-  }
+    rpc.login({ clientId: CLIENT_ID }).catch(() => {
+        statusBar.text = config.notConnectedText;
+    });
+    rpc.on('ready', () => {
+        statusBar.text = config.connectedText;
+        connectedToDiscord = true;
+    });
 }
-
-
 exports.activate = activate;
-
-// this method is called when your extension is deactivated
-function deactivate() {}
-
-module.exports = {
-	activate,
-	deactivate
-}
+function deactivate() { }
+exports.deactivate = deactivate;
